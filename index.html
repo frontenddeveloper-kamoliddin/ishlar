@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<html lang="uz">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Ish Olami - Ish izlash va berish platformasi</title>
+  <script src="https://www.gstatic.com/firebasejs/10.4.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.4.0/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.4.0/firebase-firestore-compat.js"></script>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+  <link href="css/styles.css" rel="stylesheet">
+</head>
+<body class="bg-gradient-to-br from-blue-50 to-indigo-100 min-h-screen">
+  <!-- Location Permission Modal -->
+  <div id="locationModal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+    <div class="bg-white rounded-lg p-8 max-w-md mx-4 text-center">
+      <div class="mb-6">
+        <i class="fas fa-map-marker-alt text-4xl text-blue-600 mb-4"></i>
+        <h2 class="text-2xl font-bold text-gray-800 mb-2">Joylashuv ruxsati</h2>
+        <p class="text-gray-600">
+          Sayt to'liq ishlashi uchun sizning joylashuvingizni bilishimiz kerak. 
+          Bu sizga yaqin joydagi ishlarni topishga yordam beradi.
+        </p>
+      </div>
+      <div class="flex flex-col sm:flex-row gap-3">
+        <button onclick="requestLocationPermission()" class="bg-blue-600 text-white px-6 py-3 rounded-lg hover:bg-blue-700 transition duration-300">
+          <i class="fas fa-check mr-2"></i>Ruxsat berish
+        </button>
+        <button onclick="denyLocationPermission()" class="bg-gray-300 text-gray-700 px-6 py-3 rounded-lg hover:bg-gray-400 transition duration-300">
+          <i class="fas fa-times mr-2"></i>Rad etish
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Navigation -->
+  <nav class="bg-white shadow-lg">
+    <div class="max-w-7xl mx-auto px-4">
+      <div class="flex justify-between items-center py-4">
+        <div class="flex items-center">
+          <i class="fas fa-briefcase text-2xl text-blue-600 mr-2"></i>
+          <h1 class="text-2xl font-bold text-gray-800">Ish Olami</h1>
+        </div>
+        <div class="hidden md:flex space-x-6">
+          <a href="#home" class="text-gray-600 hover:text-blue-600">Bosh sahifa</a>
+          <a href="#jobs" class="text-gray-600 hover:text-blue-600">Ishlar</a>
+          <a href="#about" class="text-gray-600 hover:text-blue-600">Haqida</a>
+          <a href="#contact" class="text-gray-600 hover:text-blue-600">Aloqa</a>
+        </div>
+      </div>
+    </div>
+  </nav>
+
+  <!-- Hero Section -->
+  <section id="home" class="py-20">
+    <div class="max-w-7xl mx-auto px-4 text-center">
+      <h1 class="text-5xl font-bold text-gray-800 mb-6">
+        O'zingizga mos <span class="text-blue-600">ish</span> toping
+      </h1>
+      <p class="text-xl text-gray-600 mb-8 max-w-3xl mx-auto">
+        Ish izlovchilar va ish beruvchilar uchun eng yaxshi platforma. 
+        Xavfsiz, tezkor va samarali ish topish va berish imkoniyati.
+      </p>
+      <div class="flex flex-col sm:flex-row gap-4 justify-center">
+        <button onclick="scrollToAuth()" class="bg-blue-600 text-white px-8 py-3 rounded-lg hover:bg-blue-700 transition duration-300">
+          <i class="fas fa-user-plus mr-2"></i>Ro'yxatdan o'tish
+        </button>
+        <button onclick="scrollToAuth()" class="bg-green-600 text-white px-8 py-3 rounded-lg hover:bg-green-700 transition duration-300">
+          <i class="fas fa-sign-in-alt mr-2"></i>Tizimga kirish
+        </button>
+      </div>
+    </div>
+  </section>
+
+  <!-- Features Section -->
+  <section class="py-16 bg-white">
+    <div class="max-w-7xl mx-auto px-4">
+      <h2 class="text-3xl font-bold text-center text-gray-800 mb-12">Nima uchun bizni tanlashingiz kerak?</h2>
+      <div class="grid md:grid-cols-3 gap-8">
+        <div class="text-center p-6">
+          <i class="fas fa-search text-4xl text-blue-600 mb-4"></i>
+          <h3 class="text-xl font-semibold mb-3">Tezkor qidiruv</h3>
+          <p class="text-gray-600">O'zingizga mos ishlarni tezda toping va ariza bering</p>
+        </div>
+        <div class="text-center p-6">
+          <i class="fas fa-comments text-4xl text-green-600 mb-4"></i>
+          <h3 class="text-xl font-semibold mb-3">Bevosita aloqa</h3>
+          <p class="text-gray-600">Ish beruvchi bilan to'g'ridan-to'g'ri suhbatlashish</p>
+        </div>
+        <div class="text-center p-6">
+          <i class="fas fa-star text-4xl text-yellow-600 mb-4"></i>
+          <h3 class="text-xl font-semibold mb-3">Reyting tizimi</h3>
+          <p class="text-gray-600">Ish beruvchilar va ishchilar reytingi orqali ishonchli tanlov</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Auth Section -->
+  <section id="auth" class="py-16">
+    <div class="max-w-md mx-auto px-4">
+      <div class="bg-white rounded-xl shadow-2xl p-8">
+        <div class="text-center mb-8">
+          <i class="fas fa-user-circle text-4xl text-blue-600 mb-4"></i>
+          <h2 class="text-2xl font-bold text-gray-800">Tizimga kirish / Ro'yxatdan o'tish</h2>
+        </div>
+
+        <!-- Auth Tabs -->
+        <div class="flex mb-6 bg-gray-100 rounded-lg p-1">
+          <button id="loginTab" onclick="switchTab('login')" class="flex-1 py-2 px-4 rounded-md bg-blue-600 text-white font-medium">
+            Kirish
+          </button>
+          <button id="registerTab" onclick="switchTab('register')" class="flex-1 py-2 px-4 rounded-md text-gray-600 font-medium">
+            Ro'yxat
+          </button>
+        </div>
+
+        <!-- Login Form -->
+        <form id="loginForm" class="space-y-4">
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-1">Email</label>
+            <input id="loginEmail" type="email" required class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+          </div>
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-1">Parol</label>
+            <input id="loginPassword" type="password" required class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+          </div>
+          <button type="submit" class="w-full bg-blue-600 text-white py-3 rounded-lg hover:bg-blue-700 transition duration-300">
+            <i class="fas fa-sign-in-alt mr-2"></i>Tizimga kirish
+          </button>
+        </form>
+
+        <!-- Register Form -->
+        <form id="registerForm" class="space-y-4 hidden">
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-1">To'liq ism</label>
+            <input id="registerName" type="text" required class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+          </div>
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-1">Email</label>
+            <input id="registerEmail" type="email" required class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+          </div>
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-1">Parol</label>
+            <input id="registerPassword" type="password" required class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+          </div>
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-1">Rol</label>
+            <select id="registerRole" required class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+              <option value="">Rolni tanlang</option>
+              <option value="jobseeker">Ish izlovchi</option>
+              <option value="employer">Ish beruvchi</option>
+            </select>
+          </div>
+          <button type="submit" class="w-full bg-green-600 text-white py-3 rounded-lg hover:bg-green-700 transition duration-300">
+            <i class="fas fa-user-plus mr-2"></i>Ro'yxatdan o'tish
+          </button>
+        </form>
+
+        <div id="authMessage" class="mt-4 p-3 rounded-lg hidden"></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Footer -->
+  <footer class="bg-gray-800 text-white py-8">
+    <div class="max-w-7xl mx-auto px-4 text-center">
+      <p>&copy; 2024 Ish Olami. Barcha huquqlar himoyalangan.</p>
+    </div>
+  </footer>
+
+  <script src="firebase/firebase-config.js"></script>
+  <script src="js/auth.js"></script>
+  <script src="js/location.js"></script>
+  <script>
+    function scrollToAuth() {
+      document.getElementById('auth').scrollIntoView({ behavior: 'smooth' });
+    }
+
+    function switchTab(tab) {
+      const loginForm = document.getElementById('loginForm');
+      const registerForm = document.getElementById('registerForm');
+      const loginTab = document.getElementById('loginTab');
+      const registerTab = document.getElementById('registerTab');
+
+      if (tab === 'login') {
+        loginForm.classList.remove('hidden');
+        registerForm.classList.add('hidden');
+        loginTab.classList.add('bg-blue-600', 'text-white');
+        loginTab.classList.remove('text-gray-600');
+        registerTab.classList.remove('bg-blue-600', 'text-white');
+        registerTab.classList.add('text-gray-600');
+      } else {
+        loginForm.classList.add('hidden');
+        registerForm.classList.remove('hidden');
+        registerTab.classList.add('bg-blue-600', 'text-white');
+        registerTab.classList.remove('text-gray-600');
+        loginTab.classList.remove('bg-blue-600', 'text-white');
+        loginTab.classList.add('text-gray-600');
+      }
+    }
+  </script>
+</body>
+</html>
